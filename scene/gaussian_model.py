@@ -402,6 +402,11 @@ class GaussianModel:
 
         torch.cuda.empty_cache()
 
-    def add_densification_stats(self, viewspace_point_tensor, update_filter, pixels):
-        self.xyz_gradient_accum[update_filter] += torch.norm(viewspace_point_tensor.grad[update_filter,:2], dim=-1, keepdim=True) * pixels[update_filter]
-        self.denom[update_filter] += pixels[update_filter]
+    def add_densification_stats(self, viewspace_point_tensor, update_filter, pixels, radii=None):
+        if radii is not None:
+            r = radii[update_filter].float().clamp(min=1)
+            weight = pixels[update_filter] / (torch.pi * r * r + 1e-8)
+        else:
+            weight = pixels[update_filter]
+        self.xyz_gradient_accum[update_filter] += torch.norm(viewspace_point_tensor.grad[update_filter,:2], dim=-1, keepdim=True) * weight
+        self.denom[update_filter] += weight
