@@ -1,0 +1,15 @@
+*.pyc
+__pycache__/
+.vscode
+.idea/
+output/
+eval/
+logs/
+build/
+*.egg-info/
+dist/
+tensorboard_3d/
+screenshots/
+tanks_and_temples/
+*.pth
+*.dmp
