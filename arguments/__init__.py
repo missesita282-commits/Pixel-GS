@@ -89,6 +89,8 @@ class OptimizationParams(ParamGroup):
         self.depth_normalized_weight = False
         self.depth_threshold = 0.37
         self.remove_sgf = False
+        self.geometric_visibility_floor = False
+        self.geo_floor_K = 20.0
         self.random_background = False
         super().__init__(parser, "Optimization Parameters")
 

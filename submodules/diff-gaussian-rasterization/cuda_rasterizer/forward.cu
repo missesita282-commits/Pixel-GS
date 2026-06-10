@@ -376,6 +376,35 @@ renderCUDA(
 	}
 }
 
+// Count geometric pixel coverage for each Gaussian based on its 2D
+// bounding circle area (pi*r^2). No alpha or transmittance checks --
+// purely geometry-based, occlusion-independent count.
+__global__ void countGeometricPixelsCUDA(
+	int P,
+	const float2* points_xy_image,
+	const int* radii,
+	float* pixels_geo)
+{
+	auto idx = cg::this_grid().thread_rank();
+	if (idx >= P || radii[idx] <= 0)
+		return;
+	float r = (float)radii[idx];
+	pixels_geo[idx] = 3.14159265f * r * r;
+}
+
+void FORWARD::countGeometricPixels(
+	int P,
+	const float2* points_xy_image,
+	const int* radii,
+	float* pixels_geo)
+{
+	countGeometricPixelsCUDA << <(P + 255) / 256, 256 >> > (
+		P,
+		points_xy_image,
+		radii,
+		pixels_geo);
+}
+
 void FORWARD::render(
 	const dim3 grid, dim3 block,
 	const uint2* ranges,

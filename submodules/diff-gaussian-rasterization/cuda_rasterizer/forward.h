@@ -47,6 +47,13 @@ namespace FORWARD
 		uint32_t* tiles_touched,
 		bool prefiltered);
 
+		// Count geometric pixel coverage (occlusion-independent).
+		void countGeometricPixels(
+			int P,
+			const float2* points_xy_image,
+			const int* radii,
+			float* pixels_geo);
+
 	// Main rasterization method.
 	void render(
 		const dim3 grid, dim3 block,

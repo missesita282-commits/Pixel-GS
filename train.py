@@ -117,10 +117,11 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
             if iteration < opt.densify_until_iter:
                 # Keep track of max radii in image-space for pruning
                 gaussians.max_radii2D[visibility_filter] = torch.max(gaussians.max_radii2D[visibility_filter], radii[visibility_filter])
-                if opt.depth_normalized_weight:
-                    gaussians.add_densification_stats(viewspace_point_tensor, visibility_filter, render_pkg["pixels"], render_pkg["radii"])
-                else:
-                    gaussians.add_densification_stats(viewspace_point_tensor, visibility_filter, render_pkg["pixels"])
+                _radii = render_pkg["radii"] if opt.depth_normalized_weight else None
+                _pixels_geo = render_pkg["pixels_geo"] if opt.geometric_visibility_floor else None
+                _K = opt.geo_floor_K
+                gaussians.add_densification_stats(viewspace_point_tensor, visibility_filter,
+                    render_pkg["pixels"], radii=_radii, pixels_geo=_pixels_geo, geo_floor_K=_K)
 
                 if iteration > opt.densify_from_iter and iteration % opt.densification_interval == 0:
                     size_threshold = 20 if iteration > opt.opacity_reset_interval else None

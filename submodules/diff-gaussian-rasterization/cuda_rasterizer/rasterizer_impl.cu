@@ -217,6 +217,7 @@ int CudaRasterizer::Rasterizer::forward(
 	const bool prefiltered,
 	float* out_color,
 	float* pixels,
+	float* pixels_geo,
 	int* radii,
 	bool debug)
 {
@@ -271,6 +272,14 @@ int CudaRasterizer::Rasterizer::forward(
 		tile_grid,
 		geomState.tiles_touched,
 		prefiltered
+	), debug)
+
+	// Compute geometric pixel coverage (occlusion-independent)
+	CHECK_CUDA(FORWARD::countGeometricPixels(
+		P,
+		geomState.means2D,
+		radii,
+		pixels_geo
 	), debug)
 
 	// Compute prefix sum over full list of touched tile counts by Gaussians
